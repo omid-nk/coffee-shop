@@ -14,7 +14,7 @@ export function Search() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative z-20 mb-4 w-full max-w-md rounded-xl bg-white/90 p-1 shadow-md backdrop-blur dark:bg-zinc-900/80"
+      className="relative z-20 mb-4 w-full max-w-md rounded-xl bg-white p-1 shadow-md backdrop-blur dark:bg-zinc-900/80"
     >
       <div className="focus-within:border-primary-1 hover:border-primary-1/60 flex items-center gap-2 rounded-lg border-2 border-dashed border-zinc-300 px-3 py-2 transition dark:border-zinc-700">
         <input
