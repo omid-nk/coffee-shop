@@ -1,0 +1,9 @@
+function loading() {
+  return (
+    <div className="fixed top-0 right-0 bottom-0 left-0 z-100 bg-zinc-700 text-white">
+      loading ...
+    </div>
+  );
+}
+
+export default loading;

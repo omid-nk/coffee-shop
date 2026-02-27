@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import useTheme from "@/hooks/useTheme";
 import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi2";
+import { motion } from "motion/react";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -15,12 +16,16 @@ export default function ThemeToggle() {
   if (!mounted) return null;
 
   return (
-    <button onClick={toggleTheme}>
+    <motion.button
+      whileTap={{ rotate: 45 }}
+      className="cursor-pointer"
+      onClick={toggleTheme}
+    >
       {theme === "dark" ? (
         <HiOutlineSun className="h-5 w-5" />
       ) : (
         <HiOutlineMoon className="h-5 w-5" />
       )}
-    </button>
+    </motion.button>
   );
 }
