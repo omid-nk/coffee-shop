@@ -9,9 +9,37 @@ import {
   HiHome,
 } from "react-icons/hi2";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 function Page() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success("با موفقیت وارد شدی");
+    router.push("/profile");
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-zinc-200 px-4 dark:bg-zinc-900">
@@ -43,14 +71,17 @@ function Page() {
         </div>
 
         {/* Form */}
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Username */}
           <div className="relative">
             <HiOutlineUser className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400" />
             <input
-              type="text"
-              placeholder="ایمیل یا نام کاربری"
+              type="email"
+              placeholder="ایمیل"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm text-zinc-900 transition outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
+              required
             />
           </div>
 
@@ -74,7 +105,10 @@ function Page() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="رمز عبور"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-10 text-sm text-zinc-900 transition outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
+              required
             />
           </div>
 
@@ -82,7 +116,6 @@ function Page() {
           <div className="text-left">
             <Link
               href="/forgot-password"
-              type="button"
               className="cursor-pointer text-xs text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             >
               رمز عبور را فراموش کرده‌اید؟
@@ -92,9 +125,10 @@ function Page() {
           {/* Submit */}
           <button
             type="submit"
-            className="mt-2 cursor-pointer rounded-lg bg-zinc-900 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            disabled={loading}
+            className="mt-2 cursor-pointer rounded-lg bg-zinc-900 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-95 disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            ورود
+            {loading ? "در حال ورود..." : "ورود"}
           </button>
 
           {/* signup */}

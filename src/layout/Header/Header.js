@@ -7,7 +7,7 @@ import CartBtn from "@/components/ui/CartBtn";
 
 // icons
 import { SiBuymeacoffee } from "react-icons/si";
-import { HiArrowRightEndOnRectangle } from "react-icons/hi2";
+import HeaderAuth from "@/components/ui/HeaderAuth";
 
 export function Header() {
   return (
@@ -33,10 +33,7 @@ export function Header() {
           <ThemeToggle />
         </div>
 
-        <Link href="/login" className="flex items-center gap-2 pr-3">
-          <HiArrowRightEndOnRectangle className="hidden h-5 w-5 md:block" />
-          <p className="mb-1 text-xs md:text-sm">ورود و ثبت‌نام</p>
-        </Link>
+        <HeaderAuth />
       </div>
     </div>
   );

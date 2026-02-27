@@ -1,6 +1,11 @@
 "use client";
 
+import { supabase } from "@/lib/supabase/client";
 import { useState } from "react";
+import Link from "next/link";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
 import {
   HiOutlineUser,
   HiOutlineEnvelope,
@@ -10,10 +15,43 @@ import {
   HiOutlineEyeSlash,
   HiHome,
 } from "react-icons/hi2";
-import Link from "next/link";
 
-function Page() {
+export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email");
+    const password = form.get("password");
+    const username = form.get("username");
+    const phone = form.get("phone");
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+          phone,
+        },
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success("ثبت‌نام انجام شد، لطفا ایمیل خود را تایید کنید");
+    router.push("/login");
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-zinc-200 px-4 dark:bg-zinc-900">
@@ -25,11 +63,11 @@ function Page() {
 
       {/* Card */}
       <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-white/60 p-6 shadow-xl backdrop-blur-xl dark:bg-zinc-950/70">
-        {/* Home button */}
+        {/* Home */}
         <Link
           href="/"
-          className="absolute top-4 right-4 z-10 text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
           aria-label="صفحه اصلی"
+          className="absolute top-4 right-4 text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
         >
           <HiHome size={20} />
         </Link>
@@ -45,15 +83,16 @@ function Page() {
         </div>
 
         {/* Form */}
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Username */}
           <div className="relative">
             <HiOutlineUser className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400" />
             <input
+              name="username"
               type="text"
-              placeholder="نام کاربری"
               required
-              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm text-zinc-900 transition outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
+              placeholder="نام کاربری"
+              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
             />
           </div>
 
@@ -61,10 +100,11 @@ function Page() {
           <div className="relative">
             <HiOutlineEnvelope className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400" />
             <input
+              name="email"
               type="email"
-              placeholder="ایمیل"
               required
-              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm text-zinc-900 transition outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
+              placeholder="ایمیل"
+              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
             />
           </div>
 
@@ -74,46 +114,45 @@ function Page() {
 
             <button
               type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute top-1/2 left-3 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-700 dark:hover:text-white"
+              onClick={() => setShowPassword((p) => !p)}
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
             >
-              {showPassword ? (
-                <HiOutlineEyeSlash size={18} />
-              ) : (
-                <HiOutlineEye size={18} />
-              )}
+              {showPassword ? <HiOutlineEyeSlash /> : <HiOutlineEye />}
             </button>
 
             <input
+              name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="رمز عبور"
               required
-              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-10 text-sm text-zinc-900 transition outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
+              placeholder="رمز عبور"
+              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-10 text-sm outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
             />
           </div>
 
-          {/* Phone (optional) */}
+          {/* Phone */}
           <div className="relative">
             <HiOutlinePhone className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400" />
             <input
+              name="phone"
               type="tel"
               placeholder="شماره تماس (اختیاری)"
-              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm text-zinc-900 transition outline-none placeholder:text-right focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
+              className="w-full rounded-lg border border-zinc-300 bg-transparent py-2 pr-10 pl-3 text-sm outline-none placeholder:text-right focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 dark:border-zinc-700 dark:text-white dark:focus:border-white dark:focus:ring-white/20"
             />
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            className="mt-2 rounded-lg bg-zinc-900 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            disabled={loading}
+            className="mt-2 rounded-lg bg-zinc-900 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            ثبت‌نام
+            {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
           </button>
 
-          {/* Back to login */}
+          {/* Login */}
           <Link
             href="/login"
-            className="text-center text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-gray-300 dark:hover:text-white"
+            className="text-center text-sm text-zinc-600 hover:text-zinc-900 dark:text-gray-300 dark:hover:text-white"
           >
             حساب داری؟ ورود به حساب
           </Link>
@@ -122,5 +161,3 @@ function Page() {
     </div>
   );
 }
-
-export default Page;
